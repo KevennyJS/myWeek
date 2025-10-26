@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#7c3aed" />
+  <title>Minha Semana — Tarefas</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icons/icon.svg" />
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Material+Symbols+Rounded:FILL@0..1&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <span class="material-symbols-rounded">checklist</span>
+      <h1>Minha Semana</h1>
+    </div>
+    <div class="actions">
+      <button id="openTaskModalBtn" class="btn">
+        <span class="material-symbols-rounded">add</span>
+        Nova atividade
+      </button>
+      <button id="installBtn" class="btn ghost">
+        <span class="material-symbols-rounded">download</span>
+        Instalar
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="controls">
+      <div class="filter-group">
+        <label class="switch">
+          <input id="onlyWeekToggle" type="checkbox" checked />
+          <span class="slider"></span>
+        </label>
+        <span class="switch-label">Mostrar apenas tarefas desta semana</span>
+      </div>
+      <div class="search-group">
+        <span class="material-symbols-rounded">search</span>
+        <input id="searchInput" type="text" placeholder="Pesquisar tarefas..." />
+      </div>
+    </section>
+
+    <!-- Form removido: agora aberto via modal -->
+    <section class="list-section">
+      <div class="list-header">
+        <h2>
+          <span class="material-symbols-rounded">event_upcoming</span>
+          Atividades
+        </h2>
+        <div class="legend">
+          <span class="chip chip-low">Baixa</span>
+          <span class="chip chip-medium">Média</span>
+          <span class="chip chip-high">Alta</span>
+          <span class="chip chip-overdue">Atrasada</span>
+        </div>
+      </div>
+      <ul id="taskList" class="task-list"></ul>
+      <div id="emptyState" class="empty-state">
+        <span class="material-symbols-rounded">inbox</span>
+        <p>Nenhuma atividade por aqui ainda.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>Feito para sua semana, com foco e leveza.</p>
+  </footer>
+
+  <script src="./app.js" defer></script>
+
+  <!-- Modal de Nova/Editar Atividade -->
+  <div id="taskModal" class="modal hidden" aria-hidden="true" role="dialog" aria-label="Nova atividade">
+    <div class="modal-backdrop"></div>
+    <div class="modal-window" role="document">
+      <div class="modal-header">
+        <h3 id="taskModalTitle"><span class="material-symbols-rounded">add_task</span> Nova atividade</h3>
+      </div>
+      <div class="modal-body">
+        <form id="taskForm">
+          <div class="grid">
+            <label>
+              Título
+              <input type="text" id="titleInput" required />
+            </label>
+            <label class="span-2">
+              Deadline
+              <button type="button" id="deadlineDisplay" class="deadline-display">
+                <span class="material-symbols-rounded">schedule</span>
+                <span id="deadlineDisplayText">Selecionar data e hora</span>
+              </button>
+            </label>
+            <label>
+              Prioridade
+              <select id="priorityInput" required>
+                <option value="low">Baixa</option>
+                <option value="medium" selected>Média</option>
+                <option value="high">Alta</option>
+              </select>
+            </label>
+            <label class="span-2">
+              Descrição
+              <textarea id="descInput" rows="2" placeholder="Opcional"></textarea>
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="taskCancelBtn" class="btn ghost"><span class="material-symbols-rounded">close</span> Cancelar</button>
+        <button type="submit" form="taskForm" id="taskSubmitBtn" class="btn"><span class="material-symbols-rounded">save</span> Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Deadline -->
+  <div id="deadlineModal" class="modal hidden" aria-hidden="true" role="dialog" aria-label="Selecionar deadline">
+    <div class="modal-backdrop"></div>
+    <div class="modal-window" role="document">
+      <div class="modal-header">
+        <h3><span class="material-symbols-rounded">event</span> Selecionar deadline</h3>
+      </div>
+      <div class="modal-body">
+        <div class="deadline-controls">
+          <div class="inline">
+            <input type="date" id="deadlineDateInput" required />
+            <input type="time" id="deadlineTimeInput" required />
+          </div>
+          <div class="quick-picks">
+            <button type="button" class="chip-btn" data-pick="today-18">Hoje 18h</button>
+            <button type="button" class="chip-btn" data-pick="tomorrow-9">Amanhã 9h</button>
+            <button type="button" class="chip-btn" data-pick="next-monday-9">Próxima segunda 9h</button>
+            <button type="button" class="chip-btn" data-pick="end-week-18">Fim da semana 18h</button>
+            <button type="button" class="chip-btn" data-pick="in-1h">Em 1h</button>
+            <button type="button" class="chip-btn" data-pick="in-3d">Em 3 dias</button>
+          </div>
+          <small id="deadlinePreview" class="muted"></small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="deadlineCancelBtn" class="btn ghost"><span class="material-symbols-rounded">close</span> Cancelar</button>
+        <button type="button" id="deadlineApplyBtn" class="btn"><span class="material-symbols-rounded">check</span> Aplicar</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
